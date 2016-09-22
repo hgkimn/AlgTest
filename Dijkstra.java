@@ -12,7 +12,7 @@ import java.util.Stack;
 //import java.util.Collections;
 import java.util.Arrays;
 
-//K번째 최단경로, 최단경로
+//K번째 최단경로, 1 최단경로
 //12개중 4개 통과!
 public class Solution {
     static final int MAX_NODE = 100005; //20만 ok
