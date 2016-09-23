@@ -1,3 +1,4 @@
+//import java.util.Scanner;
 import java.io.FileInputStream;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -12,8 +13,9 @@ import java.util.Stack;
 //import java.util.Collections;
 import java.util.Arrays;
 
-//K번째 최단경로, 1 최단경로
-//12개중 4개 통과!
+//K번째 최단경로, Dijkstra 최단경로
+//K case : 12개의 테스트케이스 중 4개가 맞았습니다.
+//1 case : 12개의 테스트케이스 중 11개가 맞았습니다. : Dist 비용초기 최대값 Integer.MAX_VALUE 실수^^
 public class Solution {
     static final int MAX_NODE = 100005; //20만 ok
     
@@ -21,12 +23,14 @@ public class Solution {
     static Vector[] AdjEdges = new Vector[MAX_NODE]; //인접한 adjacency Edges(Node)
     
     //K Shp
-    //static PriorityQueue[] Dist = new PriorityQueue[MAX_NODE]; //시작 ~ Node까지 (비용, 이전노드) Queue(최대비용먼저), K개 보관
-    //SHP
+    static PriorityQueue[] Dist = new PriorityQueue[MAX_NODE]; //시작 ~ Node까지 (비용, 이전노드) Queue(최대비용먼저), K개 보관
+    /*
+	//SHP
     static long[] Dist = new long[MAX_NODE]; //시작 ~ Node까지 최소비용
     static int[] Prev = new int[MAX_NODE]; //path
     static boolean[] Marked = new boolean[MAX_NODE]; //방문여부
-    
+    */
+	
     //최소값먼저
     static class Node implements Comparable<Node> {
     	long weight;
@@ -41,7 +45,7 @@ public class Solution {
     		return Long.compare(weight,  old.weight);
     	}
     }
-    /*
+
     //K SHP 최대값 먼저
     static class RNode implements Comparable<RNode> {
     	long weight;
@@ -66,15 +70,21 @@ public class Solution {
   		}
     	return false;
     }
-    */
+
     
     public static void main(String[] args) throws Exception {
     	long startTime = System.currentTimeMillis();
-    	
+		/*
+		FileInputStream in = new FileInputStream("sample_input2_2.txt");
+		Scanner sc = new Scanner(in);
+		//Scanner sc = new Scanner(System.in);
+		*/
+
     	System.setIn(new FileInputStream("sample_input.txt"));
     	InputStreamReader isr = new InputStreamReader(System.in);
     	BufferedReader br = new BufferedReader(isr);
     	
+		//int T = sc.nextInt();
     	int T = Integer.parseInt(br.readLine().trim());
     	for ( int a=1; a<=T; ++a) {
     		StringTokenizer tokenizer = new StringTokenizer(br.readLine().trim());
@@ -85,13 +95,14 @@ public class Solution {
     		//init
     		for (int i=1; i<=N; ++i) {
     			AdjEdges[i] = new Vector();
-    		    //Dist[i] = new PriorityQueue<RNode>(); //K SHP   		    
+    		    Dist[i] = new PriorityQueue<RNode>(); //K SHP   		    
     		}
-    	    //SHP
-    		Arrays.fill(Dist,    0, N+1, Integer.MAX_VALUE);
+    	    /*
+			//SHP
+    		Arrays.fill(Dist,    0, N+1, Long.MAX_VALUE);
     	    Arrays.fill(Prev,    0, N+1, 0);
     	    Arrays.fill(Marked,  0, N+1, false);
-
+			*/
     		
     		//Construct "weighted undirected Graph"
     		for (int i=1; i<=M; ++i) {
@@ -100,8 +111,8 @@ public class Solution {
     			int w = Integer.parseInt(tokenizer.nextToken()); //end node
     			int weight = Integer.parseInt(tokenizer.nextToken()); //cost
     			
-    			AdjEdges[v].add(new Node(weight, w));
-    			AdjEdges[w].add(new Node(weight, v));
+    			AdjEdges[v].add(new Node(weight, w));//단방향 Edge
+    			AdjEdges[w].add(new Node(weight, v));//양방향(무방향)
     		}
     		
     		//Compute Shortest Path
@@ -109,35 +120,35 @@ public class Solution {
     		int dst = N;
     		PriorityQueue<Node> pq = new PriorityQueue<Node>();
     		pq.add(new Node(0l, st));
-    		//Dist[st].add(new RNode(0l, st)); //K SHP
-    		Dist[st] = 0; //SHP
+    		Dist[st].add(new RNode(0l, st)); //K SHP
+    		//Dist[st] = 0l; //SHP
     		
     		while (!pq.isEmpty()) {
     			Node now = pq.poll();
     			int node = now.pos;
     			long cost = now.weight;
-    			
-    			if (Marked[node]) continue;
-    			Marked[node] = true;
     			/*
+    			if (Marked[node]) continue;//SHP
+    			Marked[node] = true;
+				*/
+    			
     			//K SHP 보관된 비용보다 크고, K번째 이상이면 다음Q로 통과
     			RNode tt = (RNode)Dist[node].peek();
     			if (cost > tt.weight && Dist[node].size() >= K) continue; 
-    			*/
     			
     			//노드와 연결된 모든 인접 Edge를 대상으로BFS
     			for (Object obj : AdjEdges[node]) {
     				Node there = (Node) obj;
     				int next = there.pos;
     				long newcost = cost + there.weight;
-    				
+    				/*
     				//SHP
     				if (Dist[next] > newcost) { 
     					Dist[next] = newcost;
     					Prev[next] = node;
     					pq.add(new Node(newcost, next));
     				}
-    				/*
+    				*/
     				//K SHP
     				if (chkPath(next, node)) continue; //이미 계산된 지나온 길, 통과
     				if (Dist[next].size() < K) {
@@ -150,10 +161,10 @@ public class Solution {
     					
     					Dist[next].poll();// K보다 넘치는 큰놈 제거
     				}
-    				*/
+    				
     			}
     		}
-    		/*
+    		
     		//K SHP
     		Stack stk = new Stack();
     		for (int i=1; !Dist[dst].isEmpty(); ++i) {
@@ -165,8 +176,8 @@ public class Solution {
     			for (int i=1; i<K; ++i) stk.pop();
     			System.out.println("#"+a+" " + stk.pop());
     		}
-    		*/
-
+    		
+			/*
     		//SHP
     		System.out.println("#"+a+" " + Dist[dst]);
     		for (int i=1; i<=N; ++i) {
@@ -174,6 +185,7 @@ public class Solution {
     			System.out.println("Prev["+i+"] : " + Prev[i]);
     			System.out.println("Marked["+i+"] : " + Marked[i]);
     		}
+			*/
     	}
     	//sc.close():
     	br.close();
