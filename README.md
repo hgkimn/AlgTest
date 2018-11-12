@@ -1,2 +1,0 @@
-# AlgTest
-Algorithm Test
