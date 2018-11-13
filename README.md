@@ -7,7 +7,7 @@
 
 테스트 데이터 :
 1. 인천 청라 로봇타워 인근 개활지(도로, 고가, 하천)
-   촬영 사진(P4RTK.zip, P4PRO.zip 아래 URL 참조) 
+   촬영 사진(P4RTK.zip, P4PRO.zip 반디집으로 압축. 아래 URL 참조) 
    GCP
    Pix4D, Photoscan Pro report
 
